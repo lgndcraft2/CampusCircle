@@ -1,0 +1,12 @@
+line-length = 200
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "W", "B", "S"]
+ignore = ["E501", "S101", "S311", "B008"]  # B008: FastAPI Depends() defaults are idiomatic
+
+[lint.per-file-ignores]
+"tests/conftest.py" = ["E402"]           # env must be set before the app is imported
+"scripts/*" = ["S603", "S606"]           # fixed-argument dev server launcher
+"app/cli.py" = ["S105"]                  # synthetic demo password, seeding refused in production
+"app/config.py" = ["S105"]               # development default; validate_runtime rejects it in production

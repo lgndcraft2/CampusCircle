@@ -1,0 +1,41 @@
+# Local stack: PostgreSQL + API + deadline/email worker + static frontend on http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: campuscircle
+      POSTGRES_USER: campuscircle
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-dev-only}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campuscircle"]
+      interval: 5s
+      retries: 10
+  backend:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+psycopg://campuscircle:${POSTGRES_PASSWORD:-local-dev-only}@db:5432/campuscircle
+      ALLOW_SQLITE: "false"
+      FRONTEND_URL: http://localhost:8080
+      UNIVERSITY_DIRECTORY: /app/universities.json
+    depends_on: { db: { condition: service_healthy } }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 10s
+      retries: 6
+  worker:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+psycopg://campuscircle:${POSTGRES_PASSWORD:-local-dev-only}@db:5432/campuscircle
+      ALLOW_SQLITE: "false"
+      UNIVERSITY_DIRECTORY: /app/universities.json
+    command: ["python", "-m", "app.worker"]
+    depends_on: { backend: { condition: service_healthy } }
+  frontend:
+    build: { context: ./frontend }
+    ports: ["8080:80"]
+    depends_on: { backend: { condition: service_healthy } }
+volumes:
+  pgdata:

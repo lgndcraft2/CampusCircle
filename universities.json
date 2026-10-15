@@ -1,0 +1,8 @@
+[
+  {"name":"University of Lagos","domains":["unilag.edu.ng","students.unilag.edu.ng"]},
+  {"name":"University of Ibadan","domains":["ui.edu.ng","stu.ui.edu.ng"]},
+  {"name":"Obafemi Awolowo University","domains":["oauife.edu.ng","student.oauife.edu.ng"]},
+  {"name":"Ahmadu Bello University","domains":["abu.edu.ng","student.abu.edu.ng"]},
+  {"name":"University of Nigeria","domains":["unn.edu.ng","student.unn.edu.ng"]},
+  {"name":"Demo University","domains":["students.example.edu"]}
+]
