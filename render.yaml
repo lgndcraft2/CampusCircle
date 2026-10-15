@@ -1,0 +1,51 @@
+# Render Blueprint for the CampusCircle API (Dashboard → New → Blueprint → this repo).
+# Secrets use `sync: false`: Render asks for them when the Blueprint is applied; they are never stored in git.
+services:
+  - type: web
+    name: campuscircle-api
+    runtime: docker
+    region: frankfurt            # same region as the Neon database (aws-eu-central-1)
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL          # postgresql+psycopg://...neon.tech/campuscircle?sslmode=require
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
+      - key: FRONTEND_URL          # exact Vercel origin, e.g. https://campuscircle.vercel.app (no trailing slash)
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: PORT
+        value: "8000"
+      - key: FORWARDED_ALLOW_IPS   # trust Render's proxy so rate limits see the real client address
+        value: "*"
+      - key: FINANCIAL_MODE
+        value: simulation
+      # Brevo is required in production: verification codes can only be delivered by email.
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
+      - key: BREVO_SENDER_NAME
+        value: CampusCircle
+      # Optional integrations. Leave blank to keep them visibly unavailable.
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b
+      - key: BMONI_API_KEY
+        sync: false
+      - key: BMONI_SIGNER_SEED
+        sync: false
+      - key: BMONI_WEBHOOK_SECRET
+        sync: false
+
+# The deadline/reminder/email worker (python -m app.worker) is not included because Render
+# background workers are a paid plan. Without it, "Calculate voting result" still works manually and
+# verification/reset emails are sent immediately; notification emails stay queued until a worker runs.

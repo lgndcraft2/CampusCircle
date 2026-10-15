@@ -48,5 +48,6 @@ Follow the README local setup, then run `python -m app.cli reset` from `backend/
 | B Moni webhooks | Implemented and unit-tested; **live delivery not observed** |
 | B Moni KYC, NUBAN, transfers, payouts | Not implemented (see bmoni-integration.md) |
 | Participation levels | Implemented and tested |
-| PostgreSQL / Docker Compose | Written; **not executed** (unavailable on the build machine) |
+| PostgreSQL migrations | Applied to Neon PostgreSQL 16 (tables and triggers confirmed) |
+| Docker Compose | Written; **not executed** (Docker unavailable on the build machine) |
 | Phone change verification | Blocked: no SMS provider; fails safely |

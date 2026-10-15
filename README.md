@@ -68,6 +68,17 @@ docker compose exec backend python -m app.cli seed
 
 The Compose stack runs PostgreSQL 16, the API (with migrations on start), the worker, and nginx serving the built frontend. **Not verified here:** Docker was not available on the build machine.
 
+## Deploy (Neon + Render + Vercel)
+
+The browser must reach the API on the **same origin** as the frontend, because cookies are scoped to `/api` and the API checks `Origin`. Vercel therefore proxies `/api/*` to Render.
+
+1. **Database (Neon).** Use the `campuscircle` database, and replace `postgresql://` with `postgresql+psycopg://` in the connection string. Migrations run automatically when the API starts.
+2. **API (Render).** Choose New → Blueprint → this repository. [`render.yaml`](render.yaml) defines the service (Docker, Frankfurt, health check `/api/v1/health`). Enter `DATABASE_URL`, `FRONTEND_URL`, and the Brevo keys when prompted. Production refuses to start without HTTPS, secure cookies, and PostgreSQL, and registration needs Brevo because the dev outbox is disabled.
+3. **Frontend (Vercel).** Import the repository and set the root directory to `frontend`. [`frontend/vercel.json`](frontend/vercel.json) proxies `/api` to `https://campuscircle-api.onrender.com`; edit that URL if Render assigns a different one.
+4. Set `FRONTEND_URL` on Render to the exact Vercel URL, then redeploy.
+
+The free Render plan sleeps when idle, so the first request takes 30 to 60 seconds. The worker (`python -m app.worker`) is not included in the Blueprint because it needs a paid plan.
+
 ## Environment variables
 
 See [.env.example](.env.example). Summary:

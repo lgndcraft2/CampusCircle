@@ -50,5 +50,5 @@
 - Rate limiting is database-backed per process. It is sufficient for the demo; use Redis or an edge limiter at scale.
 - Chat uses 5-second polling, not WebSockets. Voice notes and attachments are not implemented.
 - The sandbox treasury owner key is derived on the server (custodial) and is unsuitable for real funds.
-- PostgreSQL-specific triggers were written but **not executed on PostgreSQL** during this build: no PostgreSQL or Docker was available. All automated tests ran on SQLite.
+- Migrations and all PostgreSQL triggers were applied to Neon PostgreSQL 16 on 2026-10-15 (25 tables, 8 triggers present). The automated test suites still run on SQLite, so PostgreSQL row-lock and concurrency behaviour is not covered by tests.
 - Legal pages are drafts and have had no legal review. CampusCircle is not a licensed financial service.
