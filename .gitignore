@@ -17,3 +17,4 @@ backend/e2e.db*
 frontend/.npm-cache/
 *.tsbuildinfo
 Codex.md
+ignorethis.txt
