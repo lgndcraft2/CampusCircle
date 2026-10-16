@@ -69,7 +69,10 @@ def seed():
             # An open proposal awaiting votes.
             req = ok(tobi.post(f'/api/v1/circles/{cid}/loan-requests', json={'principal_minor': 25_000_00, 'purpose': 'A laptop for final-year project',
                                                                              'explanation': 'A synthetic demo request for laptop repair and project work.', 'frequency': 'monthly', 'instalment_count': 3}))
-            loan = ok(amina.post(f'/api/v1/circles/{cid}/proposals', json={'request_id': req['id'], 'interest_bps': 0, 'fees_minor': 0, 'instalment_count': 3, 'voting_hours': 48}))
+            # Round figures the demo can quote: N25,000 + 2% (N500) + N300 fee = N25,800, three instalments of N8,600.
+            # A 7-day window keeps the vote open between seeding and recording.
+            loan = ok(amina.post(f'/api/v1/circles/{cid}/proposals', json={'request_id': req['id'], 'interest_bps': 200, 'fees_minor': 300_00, 'instalment_count': 3,
+                                                                           'voting_hours': 168, 'conditions': 'The ₦300 fee covers laptop repair receipts being shared with the circle. If an instalment is late, the borrower tells the circle within 7 days.'}))
             ok(zainab.post(f'/api/v1/loans/{loan["id"]}/votes', json={'choice': 'support'}))
         if index == 1:
             # A completed vote, acceptance, simulated disbursement, one repayment, and one failed attempt.
